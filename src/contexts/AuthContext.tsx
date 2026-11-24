@@ -3,6 +3,7 @@ import type { Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { loadMemberships, signOut as doSignOut } from '../services/auth'
 import { queryClient } from '../lib/queryClient'
+import { errMsg } from '../utils/errors'
 import type { Membership } from '../types'
 
 interface AuthState {
@@ -11,6 +12,7 @@ interface AuthState {
   memberships: Membership[]
   membership: Membership | null
   recovery: boolean
+  loadError: string | null
   switchStore: (storeId: string) => void
   refresh: () => Promise<void>
   signOut: () => Promise<void>
@@ -24,15 +26,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [recovery, setRecovery] = useState(false)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
   const load = useCallback(async (s: Session | null) => {
-    if (!s) { setMemberships([]); setActiveId(null); return }
+    if (!s) { setMemberships([]); setActiveId(null); setLoadError(null); return }
     try {
       const list = await loadMemberships(s.user.id)
-      setMemberships(list)
+      setMemberships(list); setLoadError(null)
       const saved = localStorage.getItem(key(s.user.id))
       setActiveId(list.find(m => m.store_id === saved)?.store_id ?? list[0]?.store_id ?? null)
-    } catch { setMemberships([]) }
+    } catch (e) { setMemberships([]); setLoadError(errMsg(e, 'Gagal memuat data toko.')) }
   }, [])
 
   useEffect(() => {
@@ -52,12 +55,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [load])
 
   const value = useMemo<AuthState>(() => ({
-    session, loading, memberships, recovery,
+    session, loading, memberships, recovery, loadError,
     membership: memberships.find(m => m.store_id === activeId) ?? null,
     switchStore: id => { if (session) localStorage.setItem(key(session.user.id), id); setActiveId(id); queryClient.clear() },
     refresh: () => load(session),
     signOut: async () => { await doSignOut() },
-  }), [session, loading, memberships, activeId, recovery, load])
+  }), [session, loading, memberships, activeId, recovery, loadError, load])
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }

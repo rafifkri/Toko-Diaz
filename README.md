@@ -6,7 +6,7 @@ Aplikasi kasir, stok, dan keuangan untuk toko keluarga. React 18, TypeScript, Vi
 ```bash
 npm install
 cp .env.example .env        # isi VITE_SUPABASE_URL dan VITE_SUPABASE_ANON_KEY
-# Jalankan supabase/migrations/0001 ... 0010 berurutan hanya pada database kosong
+# Jalankan supabase/migrations/0001 ... 0011 berurutan hanya pada database kosong
 npm run dev
 ```
 Buat akun lewat halaman `/register` (pastikan *Allow new users to sign up* aktif di Supabase), atau lewat Supabase Dashboard → Authentication → Users, lalu masuk di `/login`. Jika belum terhubung ke toko, aplikasi akan meminta nama toko. Jika toko hanya untuk internal, nonaktifkan pendaftaran publik setelah akun pemilik dibuat, dan aktifkan *Confirm email* bila pendaftaran dibuka untuk umum; jangan simpan kredensial demo di kode. Data contoh opsional: `supabase/seed.sql`.
@@ -28,7 +28,7 @@ Akun contoh seperti `demo@example.com` tidak tersedia secara bawaan; akun harus 
 |---|---|
 | `npm run typecheck` / `npm run lint` | Pemeriksaan tipe dan gaya kode |
 | `npm test` | Tes unit dan komponen (Vitest + jsdom) |
-| `npm run test:db` | Tes database: migrasi 0001-0010 dijalankan di Postgres (PGlite), menguji RLS, HPP, retur, laporan |
+| `npm run test:db` | Tes database: migrasi 0001-0011 dijalankan di Postgres (PGlite), menguji RLS, HPP, retur, laporan |
 | `npm run test:all` | Semua tes di atas |
 | `npm run test:e2e` | Playwright (perlu browser dan akun uji, lihat `tests/e2e`) |
 | `npm run build` | Build produksi |

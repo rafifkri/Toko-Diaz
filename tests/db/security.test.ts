@@ -205,3 +205,17 @@ describe('seed.sql', () => {
     expect(rows.rows[0].c).toBe(1)
   })
 })
+
+describe('create_store idempoten', () => {
+  it('akun yang sudah punya toko aktif menerima toko yang sama dan tidak membuat toko baru', async () => {
+    const again = (await asUser<{ create_store: string }>(db, ownerA, `select create_store('Nama Lain')`))[0].create_store
+    expect(again).toBe(storeA)
+    const n = await db.query<{ c: number }>(`select count(*)::int as c from stores where owner_id = $1`, [ownerA])
+    expect(n.rows[0].c).toBe(1)
+  })
+  it('keanggotaan nonaktif ditolak dengan pesan yang jelas', async () => {
+    await db.query(`update store_users set is_active = false where user_id = $1`, [cashierA2])
+    await expect(asUser(db, cashierA2, `select create_store('Toko Baru')`)).rejects.toThrow(/dinonaktifkan/)
+    await db.query(`update store_users set is_active = true where user_id = $1`, [cashierA2])
+  })
+})

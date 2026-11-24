@@ -7,7 +7,7 @@ import { errMsg } from '../../utils/errors'
 
 /** Akun sudah login tetapi belum punya toko (mis. pendaftaran terputus atau kasir dinonaktifkan). */
 export default function NoStore() {
-  const { refresh, signOut } = useAuth()
+  const { refresh, signOut, loadError } = useAuth()
   const toast = useToast()
   const [name, setName] = useState('')
   const [busy, setBusy] = useState(false)
@@ -22,6 +22,11 @@ export default function NoStore() {
         <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-brand-50 text-brand-600"><Store /></div>
         <h1 className="text-xl font-bold">Akun belum terhubung ke toko</h1>
         <p className="text-sm text-slate-500">Jika Anda kasir, minta pemilik toko membuatkan atau mengaktifkan akun Anda. Jika Anda pemilik baru, buat toko di bawah ini.</p>
+        {loadError && (
+          <div className="rounded-lg bg-red-50 px-3 py-2 text-left text-sm text-red-700" role="alert">
+            <p>{loadError}</p>
+            <button className="mt-1 font-medium underline" onClick={() => void refresh()}>Coba muat ulang</button>
+          </div>)}
         <input className="input" placeholder="Nama toko" value={name} onChange={e => setName(e.target.value)} />
         <button className="btn-primary w-full" disabled={busy} onClick={() => void create()}>{busy ? 'Membuat…' : 'Buat toko'}</button>
         <button className="text-sm text-slate-500 hover:underline" onClick={() => void signOut()}>Keluar</button>
