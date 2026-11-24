@@ -13,6 +13,9 @@
 6. Pastikan bucket `product-images`, `store-logos`, `qris-images`, `expense-receipts` ada dan **private**.
 7. Daftar sebagai owner di `/register` (matikan konfirmasi email jika owner didaftarkan langsung).
 
+## GitHub Pages
+Workflow `.github/workflows/pages.yml` membangun dan menerbitkan aplikasi ke GitHub Pages pada push ke `main` atau `master`. Di repository settings, buka **Secrets and variables > Actions** dan tambahkan secrets `VITE_SUPABASE_URL` serta `VITE_SUPABASE_ANON_KEY`. Lalu buka **Pages** dan pilih **GitHub Actions** sebagai build and deployment source. Jangan gunakan Service Role Key di frontend; key publik tetap dilindungi oleh kebijakan RLS database.
+
 ## Uji akhir (checklist)
 - [ ] Owner: tambah kategori, produk (dengan stok awal + HPP), supplier
 - [ ] Pembelian dengan diskon, terima barang, cek HPP rata-rata di detail produk

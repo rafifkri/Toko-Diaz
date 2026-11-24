@@ -1,5 +1,5 @@
 name: CI
-on: { push: { branches: [main] }, pull_request: {} }
+on: { push: { branches: [main, master] }, pull_request: {} }
 jobs:
   verify:
     runs-on: ubuntu-latest
