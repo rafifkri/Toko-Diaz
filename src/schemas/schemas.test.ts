@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { adjustSchema, cashierSchema, expenseSchema, newPasswordSchema, productSchema, purchaseSchema } from './index'
+import { adjustSchema, cashierSchema, expenseSchema, newPasswordSchema, productSchema, purchaseSchema, registerSchema } from './index'
 
 const line = { product_id: 'p', quantity: 2, unit_cost: 1000 }
 const purchase = { supplier_id: '', purchase_date: '2026-11-24', payment_method: 'cash' as const, pay_on_receive: false, discount: 0, lines: [line] }
@@ -36,5 +36,15 @@ describe('skema validasi', () => {
     expect(adjustSchema.safeParse(a).success).toBe(true)
     expect(adjustSchema.safeParse({ ...a, reason: ' ' }).success).toBe(false)
     expect(adjustSchema.safeParse({ ...a, quantity: 0 }).success).toBe(false)
+  })
+})
+
+describe('skema pendaftaran', () => {
+  const ok = { full_name: 'Diaz', email: 'diaz@toko.id', password: 'rahasia123', confirm: 'rahasia123' }
+  it('data valid diterima', () => expect(registerSchema.safeParse(ok).success).toBe(true))
+  it('menolak sandi pendek, email salah, dan konfirmasi berbeda', () => {
+    expect(registerSchema.safeParse({ ...ok, password: 'pendek', confirm: 'pendek' }).success).toBe(false)
+    expect(registerSchema.safeParse({ ...ok, email: 'bukan-email' }).success).toBe(false)
+    expect(registerSchema.safeParse({ ...ok, confirm: 'beda12345' }).success).toBe(false)
   })
 })

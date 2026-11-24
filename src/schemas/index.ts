@@ -7,6 +7,12 @@ export const loginSchema = z.object({
   email: z.string().trim().email('Email tidak valid'),
   password: z.string().min(6, 'Minimal 6 karakter'),
 })
+export const registerSchema = z.object({
+  full_name: z.string().trim().min(2, 'Nama minimal 2 karakter').max(100),
+  email: z.string().trim().email('Email tidak valid'),
+  password: z.string().min(8, 'Minimal 8 karakter'),
+  confirm: z.string(),
+}).refine(v => v.password === v.confirm, { path: ['confirm'], message: 'Kata sandi tidak sama' })
 export const forgotSchema = z.object({ email: z.string().trim().email('Email tidak valid') })
 export const newPasswordSchema = z.object({
   password: z.string().min(8, 'Minimal 8 karakter'),

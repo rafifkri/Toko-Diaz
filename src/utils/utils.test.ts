@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { addToCart, reconcileCart, removeItem, setQty, totals, type CartItem } from './cart'
-import { errMsg } from './errors'
+import { authErrorMessage, errMsg, signUpErrorMessage } from './errors'
 import { toCsv } from './export'
 import { dateLabel, monthLabel, rupiah, rupiahShort } from './format'
 import { bucketDaily, endOfDayJakarta, iso, nextDay, presetRange } from './period'
@@ -92,4 +92,20 @@ describe('struk', () => {
     const h = buildReceiptHtml({ ...r, method: 'transfer', reference: 'TRX9', received: 9000, change: 0 }, 58)
     expect(h).toContain('TRX9'); expect(h).not.toContain('Kembalian')
   })
+})
+
+describe('pesan kegagalan masuk', () => {
+  it('kredensial salah', () => expect(authErrorMessage({ code: 'invalid_credentials', status: 400, message: 'Invalid login credentials' })).toBe('Email atau kata sandi salah.'))
+  it('email belum dikonfirmasi', () => expect(authErrorMessage({ code: 'email_not_confirmed', message: 'Email not confirmed' })).toMatch(/belum dikonfirmasi/))
+  it('batas percobaan', () => expect(authErrorMessage({ status: 429, message: 'rate limit' })).toMatch(/Terlalu banyak/))
+  it('jaringan', () => expect(authErrorMessage({ name: 'AuthRetryableFetchError', message: 'Failed to fetch' })).toMatch(/terhubung/))
+  it('kunci API salah', () => expect(authErrorMessage({ message: 'Invalid API key' })).toMatch(/Konfigurasi Supabase/))
+  it('error tak dikenal tidak disebut salah sandi', () => expect(authErrorMessage(new Error('boom'))).toBe('Gagal masuk. Coba lagi.'))
+})
+
+describe('pesan kegagalan daftar', () => {
+  it('email sudah terdaftar', () => expect(signUpErrorMessage({ code: 'user_already_exists' })).toMatch(/sudah terdaftar/))
+  it('pendaftaran ditutup', () => expect(signUpErrorMessage({ code: 'signup_disabled' })).toMatch(/ditutup/))
+  it('sandi lemah', () => expect(signUpErrorMessage({ code: 'weak_password' })).toMatch(/lemah/))
+  it('tak dikenal', () => expect(signUpErrorMessage(new Error('x'))).toBe('Pendaftaran gagal. Coba lagi.'))
 })

@@ -43,7 +43,10 @@ function LoginFormView() {
       <Field label="Kata sandi" error={errors.password?.message}><input className="input" type="password" autoComplete="current-password" {...register('password')} /></Field>
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">{error}</p>}
       <button className="btn-primary w-full" disabled={isSubmitting}>{isSubmitting ? 'Memproses…' : 'Masuk'}</button>
-      <div className="text-sm"><Link to="/forgot-password" className="link">Lupa kata sandi?</Link></div>
+      <div className="flex items-center justify-between text-sm">
+        <Link to="/forgot-password" className="link">Lupa kata sandi?</Link>
+        <span className="text-slate-500">Belum punya akun? <Link to="/register" className="link">Daftar</Link></span>
+      </div>
     </form>)
 }
 

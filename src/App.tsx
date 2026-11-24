@@ -1,8 +1,9 @@
 import { lazy, Suspense } from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import { ProtectedRoute, RequireOwner } from './routes/guards'
 import { PageLoader } from './components/ui/feedback'
 import Login from './pages/auth/Login'
+import Register from './pages/auth/Register'
 import { ForgotPassword, ResetPassword } from './pages/auth/PasswordPages'
 import NotFound from './pages/system/NotFound'
 import Pos from './pages/pos/Pos'
@@ -33,7 +34,7 @@ export default function App() {
     <Suspense fallback={<PageLoader />}>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Navigate to="/login" replace />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route element={<ProtectedRoute />}>

@@ -1,10 +1,18 @@
 import { supabase } from '../lib/supabase'
 import { ok, rpc } from './http'
 import type { Membership, Role } from '../types'
+import { authErrorMessage, signUpErrorMessage } from '../utils/errors'
 
 export async function signIn(email: string, password: string): Promise<void> {
   const { error } = await supabase.auth.signInWithPassword({ email, password })
-  if (error) throw new Error('Email atau kata sandi salah.')
+  if (error) throw new Error(authErrorMessage(error))
+}
+
+/** Mengembalikan true bila sesi langsung aktif; false bila Supabase meminta konfirmasi email dulu. */
+export async function signUp(fullName: string, email: string, password: string): Promise<boolean> {
+  const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: fullName } } })
+  if (error) throw new Error(signUpErrorMessage(error))
+  return data.session !== null
 }
 
 export const createStore = (name: string) => rpc<string>('create_store', { p_store_name: name })
