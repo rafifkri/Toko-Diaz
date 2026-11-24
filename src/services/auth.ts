@@ -7,15 +7,6 @@ export async function signIn(email: string, password: string): Promise<void> {
   if (error) throw new Error('Email atau kata sandi salah.')
 }
 
-/** Mendaftarkan pemilik. Mengembalikan false bila perlu konfirmasi email dulu. */
-export async function signUpOwner(v: { email: string; password: string; fullName: string; storeName: string }): Promise<boolean> {
-  const { data, error } = await supabase.auth.signUp({ email: v.email, password: v.password, options: { data: { full_name: v.fullName } } })
-  if (error) throw new Error('Pendaftaran gagal. Periksa email dan kata sandi.')
-  if (!data.session) return false
-  await rpc('create_store', { p_store_name: v.storeName })
-  return true
-}
-
 export const createStore = (name: string) => rpc<string>('create_store', { p_store_name: name })
 
 export async function sendResetEmail(email: string): Promise<void> {

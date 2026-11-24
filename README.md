@@ -6,10 +6,10 @@ Aplikasi kasir, stok, dan keuangan untuk toko keluarga. React 18, TypeScript, Vi
 ```bash
 npm install
 cp .env.example .env        # isi VITE_SUPABASE_URL dan VITE_SUPABASE_ANON_KEY
-# Jalankan supabase/migrations/0001 ... 0010 berurutan (SQL Editor atau `supabase db push`)
+# Jalankan supabase/migrations/0001 ... 0010 berurutan hanya pada database kosong
 npm run dev
 ```
-Daftar sebagai pemilik di `/register`; toko dan data bawaan dibuat otomatis. Data contoh opsional: `supabase/seed.sql`.
+Untuk demo, buat akun di Supabase Dashboard → Authentication → Users, lalu masuk di `/login`. Jika belum terhubung ke toko, aplikasi akan meminta nama toko. Nonaktifkan pendaftaran publik di pengaturan Auth; jangan simpan kredensial demo di kode. Data contoh opsional: `supabase/seed.sql`.
 
 ## Perintah
 | Perintah | Fungsi |

@@ -7,11 +7,6 @@ export const loginSchema = z.object({
   email: z.string().trim().email('Email tidak valid'),
   password: z.string().min(6, 'Minimal 6 karakter'),
 })
-export const registerSchema = loginSchema.extend({
-  fullName: z.string().trim().min(2, 'Nama wajib diisi'),
-  storeName: z.string().trim().min(2, 'Nama toko wajib diisi'),
-  password: z.string().min(8, 'Minimal 8 karakter'),
-})
 export const forgotSchema = z.object({ email: z.string().trim().email('Email tidak valid') })
 export const newPasswordSchema = z.object({
   password: z.string().min(8, 'Minimal 8 karakter'),

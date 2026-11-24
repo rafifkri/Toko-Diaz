@@ -4,14 +4,13 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useAuth } from '../../contexts/AuthContext'
-import { signIn, signUpOwner } from '../../services/auth'
-import { loginSchema, registerSchema } from '../../schemas'
+import { signIn } from '../../services/auth'
+import { loginSchema } from '../../schemas'
 import { errMsg } from '../../utils/errors'
 import Logo from '../../components/layout/Logo'
 import { Field } from '../../components/ui/feedback'
 
 type LoginForm = z.infer<typeof loginSchema>
-type RegisterForm = z.infer<typeof registerSchema>
 
 export function AuthShell({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
   return (
@@ -44,36 +43,12 @@ function LoginFormView() {
       <Field label="Kata sandi" error={errors.password?.message}><input className="input" type="password" autoComplete="current-password" {...register('password')} /></Field>
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">{error}</p>}
       <button className="btn-primary w-full" disabled={isSubmitting}>{isSubmitting ? 'Memproses…' : 'Masuk'}</button>
-      <div className="flex justify-between text-sm"><Link to="/forgot-password" className="link">Lupa kata sandi?</Link><Link to="/register" className="link">Pemilik baru? Daftar</Link></div>
+      <div className="text-sm"><Link to="/forgot-password" className="link">Lupa kata sandi?</Link></div>
     </form>)
 }
 
-function RegisterFormView() {
-  const [error, setError] = useState('')
-  const [info, setInfo] = useState('')
-  const { refresh } = useAuth()
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<RegisterForm>({ resolver: zodResolver(registerSchema) })
-  const submit = async (v: RegisterForm) => {
-    setError(''); setInfo('')
-    try { const done = await signUpOwner(v); if (done) await refresh(); else setInfo('Cek email Anda untuk konfirmasi, lalu masuk.') } catch (e) { setError(errMsg(e)) }
-  }
-  return (
-    <form onSubmit={handleSubmit(submit)} className="space-y-4" noValidate>
-      <Field label="Nama lengkap" error={errors.fullName?.message}><input className="input" autoComplete="name" {...register('fullName')} /></Field>
-      <Field label="Nama toko" error={errors.storeName?.message}><input className="input" {...register('storeName')} /></Field>
-      <Field label="Email" error={errors.email?.message}><input className="input" type="email" autoComplete="email" {...register('email')} /></Field>
-      <Field label="Kata sandi" error={errors.password?.message} hint="Minimal 8 karakter."><input className="input" type="password" autoComplete="new-password" {...register('password')} /></Field>
-      {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">{error}</p>}
-      {info && <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700" role="status">{info}</p>}
-      <button className="btn-primary w-full" disabled={isSubmitting}>{isSubmitting ? 'Memproses…' : 'Daftar'}</button>
-      <p className="text-center text-sm"><Link to="/login" className="link">Sudah punya akun? Masuk</Link></p>
-    </form>)
-}
-
-export default function Login({ mode = 'login' }: { mode?: 'login' | 'register' }) {
-  const { session, loading, membership } = useAuth()
-  if (!loading && session && membership) return <Navigate to="/" replace />
-  return mode === 'login'
-    ? <AuthShell title="Masuk" subtitle="Gunakan akun Toko Diaz Anda."><LoginFormView /></AuthShell>
-    : <AuthShell title="Daftar sebagai pemilik" subtitle="Buat akun dan toko Anda."><RegisterFormView /></AuthShell>
+export default function Login() {
+  const { session, loading } = useAuth()
+  if (!loading && session) return <Navigate to="/" replace />
+  return <AuthShell title="Masuk" subtitle="Gunakan akun Toko Diaz Anda."><LoginFormView /></AuthShell>
 }

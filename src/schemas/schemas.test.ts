@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { adjustSchema, cashierSchema, expenseSchema, newPasswordSchema, productSchema, purchaseSchema, registerSchema } from './index'
+import { adjustSchema, cashierSchema, expenseSchema, newPasswordSchema, productSchema, purchaseSchema } from './index'
 
 const line = { product_id: 'p', quantity: 2, unit_cost: 1000 }
 const purchase = { supplier_id: '', purchase_date: '2026-11-24', payment_method: 'cash' as const, pay_on_receive: false, discount: 0, lines: [line] }
@@ -30,7 +30,6 @@ describe('skema validasi', () => {
     expect(newPasswordSchema.safeParse({ password: 'abcdefgh', confirm: 'abcdefgx' }).success).toBe(false)
     expect(newPasswordSchema.safeParse({ password: 'abc', confirm: 'abc' }).success).toBe(false)
     expect(cashierSchema.safeParse({ full_name: 'Sari', email: 'bukan-email', password: '12345678' }).success).toBe(false)
-    expect(registerSchema.safeParse({ fullName: 'A', storeName: 'T', email: 'a@b.id', password: '12345678' }).success).toBe(false)
   })
   it('penyesuaian stok: jumlah minimal 1 dan alasan wajib', () => {
     const a = { product_id: 'p', type: 'damage_out' as const, direction: 'out' as const, quantity: 1, reason: 'pecah' }

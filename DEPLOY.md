@@ -11,7 +11,7 @@
 4. Frontend (Vercel/Netlify): build `npm run build`, output `dist`. `vercel.json` dan `public/_redirects` sudah menangani rewrite SPA dan header keamanan.
 5. Environment variables frontend: hanya `VITE_SUPABASE_URL` dan `VITE_SUPABASE_ANON_KEY`.
 6. Pastikan bucket `product-images`, `store-logos`, `qris-images`, `expense-receipts` ada dan **private**.
-7. Daftar sebagai owner di `/register` (matikan konfirmasi email jika owner didaftarkan langsung).
+7. Buat akun owner/demo dari Supabase Dashboard → Authentication → Users, lalu masuk melalui `/login`. Jika akun belum punya toko, aplikasi akan meminta nama toko. Nonaktifkan pendaftaran publik setelah akun dibuat.
 
 ## GitHub Pages
 Workflow `.github/workflows/pages.yml` membangun dan menerbitkan aplikasi ke GitHub Pages pada push ke `main` atau `master`. Di repository settings, buka **Secrets and variables > Actions** dan tambahkan secrets `VITE_SUPABASE_URL` serta `VITE_SUPABASE_ANON_KEY`. Lalu buka **Pages** dan pilih **GitHub Actions** sebagai build and deployment source. Jangan gunakan Service Role Key di frontend; key publik tetap dilindungi oleh kebijakan RLS database.
