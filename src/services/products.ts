@@ -38,13 +38,14 @@ export async function listProductOptions(sid: string): Promise<ProductOption[]> 
     .eq('store_id', sid).eq('is_active', true).order('product_name').limit(1000))
 }
 
-const payload = (v: ProductForm) => ({
-  product_code: v.product_code, product_name: v.product_name, unit: v.unit, selling_price: v.selling_price, minimum_stock: v.minimum_stock,
+// product_code ditetapkan saat produk dibuat dan tidak dapat diubah (hak UPDATE kolom itu memang ditutup di database).
+const editable = (v: ProductForm) => ({
+  product_name: v.product_name, unit: v.unit, selling_price: v.selling_price, minimum_stock: v.minimum_stock,
   barcode: blank(v.barcode), category_id: blank(v.category_id),
 })
 
 export async function createProduct(sid: string, v: ProductForm, photo?: File | null): Promise<string> {
-  const row = ok<{ id: string }>(await supabase.from('products').insert({ ...payload(v), store_id: sid }).select('id').single())
+  const row = ok<{ id: string }>(await supabase.from('products').insert({ ...editable(v), product_code: v.product_code, store_id: sid }).select('id').single())
   if (photo) await setProductPhoto(sid, row.id, photo)
   if (v.initial_stock && v.initial_stock > 0) {
     await rpc('adjust_stock', { p_product: row.id, p_delta: v.initial_stock, p_reason: 'Stok awal', p_type: 'adjustment', p_unit_cost: v.initial_cost ?? null })
@@ -54,7 +55,7 @@ export async function createProduct(sid: string, v: ProductForm, photo?: File | 
 
 export async function updateProduct(sid: string, id: string, v: ProductForm, photo?: File | null): Promise<void> {
   const image = photo ? await setProductPhoto(sid, id, photo, false) : undefined
-  ok(await supabase.from('products').update({ ...payload(v), ...(image ? { image_url: image } : {}), updated_at: new Date().toISOString() }).eq('id', id))
+  ok(await supabase.from('products').update({ ...editable(v), ...(image ? { image_url: image } : {}), updated_at: new Date().toISOString() }).eq('id', id))
 }
 
 async function setProductPhoto(sid: string, id: string, file: File, save = true): Promise<string> {

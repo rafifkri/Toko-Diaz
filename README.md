@@ -29,6 +29,7 @@ Akun contoh seperti `demo@example.com` tidak tersedia secara bawaan; akun harus 
 | `npm run typecheck` / `npm run lint` | Pemeriksaan tipe dan gaya kode |
 | `npm test` | Tes unit dan komponen (Vitest + jsdom) |
 | `npm run test:db` | Tes database: migrasi 0001-0011 dijalankan di Postgres (PGlite), menguji RLS, HPP, retur, laporan |
+| `npm run test:rest` | Tes layanan dan halaman terhadap PostgREST + Postgres sungguhan (butuh `REST_URL`, lihat `tests/rest/README.md`); dilewati bila `REST_URL` kosong |
 | `npm run test:all` | Semua tes di atas |
 | `npm run test:e2e` | Playwright (perlu browser dan akun uji, lihat `tests/e2e`) |
 | `npm run build` | Build produksi |

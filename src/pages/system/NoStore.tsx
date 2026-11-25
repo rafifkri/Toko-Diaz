@@ -20,15 +20,17 @@ export default function NoStore() {
     <div className="grid min-h-screen place-items-center p-6">
       <div className="card w-full max-w-md space-y-4 text-center">
         <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-brand-50 text-brand-600"><Store /></div>
-        <h1 className="text-xl font-bold">Akun belum terhubung ke toko</h1>
-        <p className="text-sm text-slate-500">Jika Anda kasir, minta pemilik toko membuatkan atau mengaktifkan akun Anda. Jika Anda pemilik baru, buat toko di bawah ini.</p>
+        <h1 className="text-xl font-bold">Satu langkah lagi</h1>
+        <p className="text-sm text-slate-500">Pemilik baru: beri nama toko Anda untuk mulai. Kasir: akun Anda belum terhubung ke toko, minta pemilik toko membuatkan atau mengaktifkannya.</p>
         {loadError && (
           <div className="rounded-lg bg-red-50 px-3 py-2 text-left text-sm text-red-700" role="alert">
             <p>{loadError}</p>
             <button className="mt-1 font-medium underline" onClick={() => void refresh()}>Coba muat ulang</button>
           </div>)}
-        <input className="input" placeholder="Nama toko" value={name} onChange={e => setName(e.target.value)} />
-        <button className="btn-primary w-full" disabled={busy} onClick={() => void create()}>{busy ? 'Membuat…' : 'Buat toko'}</button>
+        <form className="space-y-4" onSubmit={e => { e.preventDefault(); void create() }}>
+          <input className="input" placeholder="Nama toko" aria-label="Nama toko" value={name} onChange={e => setName(e.target.value)} />
+          <button className="btn-primary w-full" disabled={busy}>{busy ? 'Membuat…' : 'Buat toko'}</button>
+        </form>
         <button className="text-sm text-slate-500 hover:underline" onClick={() => void signOut()}>Keluar</button>
       </div>
     </div>)

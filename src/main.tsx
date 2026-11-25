@@ -8,9 +8,12 @@ import { ToastProvider } from './contexts/ToastContext'
 import { DialogProvider } from './contexts/DialogContext'
 import ErrorBoundary from './pages/system/ErrorBoundary'
 import { queryClient } from './lib/queryClient'
+import { configError } from './lib/supabase'
+import ConfigError from './pages/system/ConfigError'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
+  configError ? <ConfigError message={configError} /> :
   <React.StrictMode>
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>

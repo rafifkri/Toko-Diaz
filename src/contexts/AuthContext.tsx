@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { loadMemberships, signOut as doSignOut } from '../services/auth'
@@ -27,6 +27,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
   const [recovery, setRecovery] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
+  // Pengguna yang daftar toko-nya sudah/sedang dimuat; mencegah pemuatan ulang pada event token refresh.
+  const loadedFor = useRef<string | null>(null)
 
   const load = useCallback(async (s: Session | null) => {
     if (!s) { setMemberships([]); setActiveId(null); setLoadError(null); return }
@@ -42,14 +44,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let alive = true
     supabase.auth.getSession().then(async ({ data }) => {
       if (!alive) return
+      loadedFor.current = data.session?.user.id ?? null
       setSession(data.session); await load(data.session); if (alive) setLoading(false)
     })
     const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
       if (event === 'PASSWORD_RECOVERY') setRecovery(true)
       setSession(s)
-      // Jangan memanggil Supabase langsung di dalam callback ini (risiko deadlock): tunda.
-      setTimeout(() => { void load(s) }, 0)
-      if (event === 'SIGNED_OUT') queryClient.clear()
+      if (!s) { loadedFor.current = null; void load(null); if (event === 'SIGNED_OUT') queryClient.clear(); return }
+      // Login baru: tahan tampilan (loading) sampai daftar toko selesai dimuat, supaya halaman
+      // "akun belum terhubung ke toko" tidak sempat berkedip. Jangan memanggil Supabase langsung di callback ini (risiko deadlock): tunda.
+      if (loadedFor.current !== s.user.id) {
+        loadedFor.current = s.user.id
+        setLoading(true)
+        setTimeout(() => { void load(s).finally(() => { if (alive) setLoading(false) }) }, 0)
+      }
     })
     return () => { alive = false; sub.subscription.unsubscribe() }
   }, [load])

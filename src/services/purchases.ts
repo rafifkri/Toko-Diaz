@@ -20,7 +20,7 @@ export interface PurchaseDetail { purchase: Purchase; items: PurchaseItem[]; pay
 export async function getPurchase(id: string): Promise<PurchaseDetail> {
   const [purchase, items, payments] = await Promise.all([
     supabase.from('purchases').select('*, suppliers(supplier_name)').eq('id', id).single(),
-    supabase.from('purchase_items').select('*, products(product_name, unit)').eq('purchase_id', id).order('created_at'),
+    supabase.from('purchase_items').select('*, products(product_name, unit)').eq('purchase_id', id),
     supabase.from('purchase_payments').select('*').eq('purchase_id', id).order('payment_date').order('created_at'),
   ])
   return { purchase: ok<Purchase>(purchase), items: ok<PurchaseItem[]>(items), payments: ok<PurchasePayment[]>(payments) }

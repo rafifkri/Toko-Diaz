@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -24,13 +24,19 @@ export default function ProductForm({ product, onClose }: { product: ProductRow 
   const [photo, setPhoto] = useState<File | null>(null)
   const [photoErr, setPhotoErr] = useState('')
   const editing = !!product
-  const { register, handleSubmit, control, formState: { errors } } = useForm<Form>({
+  const { register, handleSubmit, control, setValue, getFieldState, formState: { errors } } = useForm<Form>({
     resolver: zodResolver(productSchema),
     defaultValues: product ? {
       product_code: product.product_code, product_name: product.product_name, unit: product.unit, selling_price: product.selling_price,
       minimum_stock: product.minimum_stock, barcode: product.barcode ?? '', category_id: product.category_id ?? '',
     } : { product_code: '', product_name: '', unit: settings?.default_unit ?? 'pcs', selling_price: 0, minimum_stock: settings?.default_minimum_stock ?? 0, barcode: '', category_id: '', initial_stock: 0, initial_cost: 0 },
   })
+  // Pengaturan stok bisa tiba setelah form terbuka: terapkan sebagai nilai awal selama pengguna belum mengubahnya.
+  useEffect(() => {
+    if (editing || !settings) return
+    if (!getFieldState('unit').isDirty) setValue('unit', settings.default_unit)
+    if (!getFieldState('minimum_stock').isDirty) setValue('minimum_stock', settings.default_minimum_stock)
+  }, [editing, settings, setValue, getFieldState])
   const save = useMutation({
     mutationFn: (v: Form) => (product ? updateProduct(storeId, product.id, v, photo) : createProduct(storeId, v, photo).then(() => undefined)),
     onSuccess: () => {
@@ -44,7 +50,7 @@ export default function ProductForm({ product, onClose }: { product: ProductRow 
     <Modal open onClose={onClose} title={editing ? `Ubah produk ${product.product_code}` : 'Tambah produk'} size="lg"
       footer={<><button className="btn-secondary" onClick={onClose}>Batal</button><button className="btn-primary" disabled={save.isPending} form="product-form" type="submit">{save.isPending ? 'Menyimpan…' : 'Simpan'}</button></>}>
       <form id="product-form" onSubmit={handleSubmit(v => save.mutate(v))} className="grid gap-4 sm:grid-cols-2" noValidate>
-        <Field label="Kode produk" error={errors.product_code?.message}><input className="input" disabled={editing} {...register('product_code')} /></Field>
+        <Field label="Kode produk" error={errors.product_code?.message}><input className="input" readOnly={editing} aria-readonly={editing} {...register('product_code')} /></Field>
         <Field label="Nama produk" error={errors.product_name?.message}><input className="input" {...register('product_name')} /></Field>
         <Field label="Kategori"><select className="input" {...register('category_id')}><option value="">Tanpa kategori</option>{cats.map(c => <option key={c.id} value={c.id}>{c.category_name}</option>)}</select></Field>
         <Field label="Barcode (opsional)" error={errors.barcode?.message}><input className="input" inputMode="numeric" {...register('barcode')} /></Field>

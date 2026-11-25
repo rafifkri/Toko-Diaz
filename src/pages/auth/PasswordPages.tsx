@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { forgotSchema, newPasswordSchema } from '../../schemas'
 import { sendResetEmail, updatePassword } from '../../services/auth'
 import { errMsg } from '../../utils/errors'
+import { appUrl } from '../../lib/paths'
 import { Field } from '../../components/ui/feedback'
 import { useToast } from '../../contexts/ToastContext'
 import { AuthShell } from './Login'
@@ -28,13 +29,16 @@ export function ForgotPassword() {
 }
 
 export function ResetPassword() {
-  const nav = useNavigate()
   const toast = useToast()
   const [error, setError] = useState('')
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<z.infer<typeof newPasswordSchema>>({ resolver: zodResolver(newPasswordSchema) })
   const submit = async (v: { password: string }) => {
     setError('')
-    try { await updatePassword(v.password); toast.success('Kata sandi diperbarui.'); window.location.assign('/') } catch (e) { setError(errMsg(e)); void nav }
+    try { await updatePassword(v.password); toast.success('Kata sandi diperbarui.'); window.location.assign(appUrl()) }
+    catch (e) {
+      const m = e instanceof Error ? e.message : ''
+      setError(/session missing/i.test(m) ? 'Tautan reset tidak valid atau sudah kedaluwarsa. Minta tautan baru dari halaman Lupa kata sandi.' : errMsg(e))
+    }
   }
   return (
     <AuthShell title="Buat kata sandi baru" subtitle="Masukkan kata sandi baru untuk akun Anda.">
